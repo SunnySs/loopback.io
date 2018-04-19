@@ -65,10 +65,10 @@ module.exports = function(app, callback) {
   // Obtain the datasource registered with the name "db"
   const dataSource = app.dataSources.db;
 
-  // Step 1: define a model for "salaries" table,
-  // including any models for related tables (e.g. "employees").
+  // Step 1: define a model for "INVENTORY" table,
+  // including any models for related tables (e.g. "PRODUCT").
   dataSource.discoverAndBuildModels(
-    'salaries',
+    'INVENTORY',
     {relations: true},
     function(err, models) {
       if (err) return callback(err);
@@ -155,26 +155,26 @@ async function discover() {
   const options = {relations: true};
 
   // Discover models and relations
-  const salariesSchemas = await db.discoverSchemas('salaries', options);
-  const employeesSchemas = await db.discoverSchemas('employees', options);
+  const inventorySchemas = await db.discoverSchemas('INVENTORY', options);
+  const productSchemas = await db.discoverSchemas('PRODUCT', options);
 
   // Create model definition files
   await mkdirp('common/models');
   await writeFile(
-    'common/models/salaries.json',
-    JSON.stringify(salariesSchemas['employees.salaries'], null, 2)
+    'common/models/inventory.json',
+    JSON.stringify(inventorySchemas['XE.INVENTORY'], null, 2)
   );
   await writeFile(
-    'common/models/employees.json',
-    JSON.stringify(salariesSchemas['employees.employees'], null, 2)
+    'common/models/product.json',
+    JSON.stringify(salariesSchemas['XE.PRODUCT'], null, 2)
   );
 
   // Expose models via REST API
   const configJson = await readFile('server/model-config.json', 'utf-8');
   console.log('MODEL CONFIG', configJson);
   const config = JSON.parse(configJson);
-  config.Salaries = {dataSource: DATASOURCE_NAME, public: true};
-  config.Employees = {dataSource: DATASOURCE_NAME, public: true};
+  config.Inventory = {dataSource: DATASOURCE_NAME, public: true};
+  config.Product = {dataSource: DATASOURCE_NAME, public: true};
   await writeFile(
     'server/model-config.json',
     JSON.stringify(config, null, 2)
@@ -189,9 +189,9 @@ Next steps:
  2. Start your application in the usual way, e.g. via `npm start` or `node .`
  3. Use [API Explorer](./Use-API-Explorer.md) to inspect your newly defined
     REST API.
- 4. Notice that "salaries" model exposes BelongsTo relation with "employees"
-    model. There is no counter relation "employees has many salaries",
-    you have to define this relation yourself.
+ 4. Notice that "INVENTORY" model exposes BelongsTo relation with "PRODUCT"
+    model. The counter relation "PRODUCT has many INVENTORY" was not
+    automatically discovered, you have to define this relation yourself.
 
 ## Additional discovery functions
 
